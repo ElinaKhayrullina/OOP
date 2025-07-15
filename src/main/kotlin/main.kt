@@ -1,10 +1,12 @@
+class Likes(val countLikes: Int)
+
 data class Post(
     val id: Int = 0,
     val ownerId: Int,
     val fromId: Int,
     val date: Int,
     val text: String,
-    val likes: Int = 1,
+    val likes: Likes = Likes(0),
     val canPin: Boolean = true,
     val canDelete: Boolean = true,
     val canEdit: Boolean = true,
@@ -13,10 +15,16 @@ data class Post(
 
 object WallService {
     private var posts = emptyArray<Post>()
+    var count = 0
+
+    fun clear() {
+        posts = emptyArray()
+        count = 0
+    }
 
     fun add(post: Post): Int {
-        val id = posts.lastIndex
-        val newId = post.copy(id = id + 2)
+        count += 1
+        val newId = post.copy(id = count)
         posts += newId
         println(newId)
         return posts.last().id
