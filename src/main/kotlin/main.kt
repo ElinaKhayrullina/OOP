@@ -1,3 +1,4 @@
+
 interface Attachment {
     val type: TypeAttachment
 }
@@ -84,6 +85,13 @@ data class LinkAttachment(
 }
 
 class Likes(val countLikes: Int)
+
+public open class Comment(
+    val id: Int,
+    val fromId: Int,
+    val text: String
+)
+
 data class Post(
     val id: Int = 1,
     val ownerId: Int,
@@ -98,9 +106,13 @@ data class Post(
     val attachments: Array<Attachment> = emptyArray()
 )
 
+class PostNotFoundException(message: String) : RuntimeException(message)
+
 object WallService {
     private var posts = emptyArray<Post>()
     var count = 0
+    private var comments = emptyArray<Comment>()
+
     fun clear() {
         posts = emptyArray()
         count = 0
@@ -121,6 +133,16 @@ object WallService {
         } else {
             val text = post.copy(text = post.text)
             return true
+        }
+    }
+
+    fun createComment(postId: Int, comment: Comment): Comment {
+        val post = posts.find { it.id == postId }
+        if (post != null) {
+            comments += comment
+            return comments.last()
+        } else {
+            throw PostNotFoundException("No post with id $postId")
         }
     }
 }
@@ -172,8 +194,11 @@ fun main() {
         )
     )
     WallService.add(post3)
+    val com = WallService.createComment(10, Comment(1, 2, "Комментарий к посту")).text
+
     println(post1)
     println(post2)
     println(post3)
+    println(com)
 }
 
